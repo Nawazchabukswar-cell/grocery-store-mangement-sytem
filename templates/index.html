@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GroceryHub - Grocery Store Management System</title>
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet" />
+  <!-- FontAwesome & Chart.js -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <i class="fa-solid fa-cart-shopping brand-icon"></i>
+        <h2>Grocery<span>Hub</span></h2>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="#dashboard" class="nav-item active" data-tab="dashboard">
+          <i class="fa-solid fa-chart-pie"></i> <span>Dashboard</span>
+        </a>
+        <a href="#products" class="nav-item" data-tab="products">
+          <i class="fa-solid fa-boxes-stacked"></i> <span>Products</span>
+        </a>
+        <a href="#categories" class="nav-item" data-tab="categories">
+          <i class="fa-solid fa-tags"></i> <span>Categories</span>
+        </a>
+        <a href="#pos" class="nav-item" data-tab="pos">
+          <i class="fa-solid fa-cash-register"></i> <span>Sales / Billing</span>
+        </a>
+        <a href="#inventory" class="nav-item" data-tab="inventory">
+          <i class="fa-solid fa-warehouse"></i> <span>Inventory</span>
+        </a>
+        <a href="#customers" class="nav-item" data-tab="customers">
+          <i class="fa-solid fa-users"></i> <span>Customers</span>
+        </a>
+        <a href="#suppliers" class="nav-item" data-tab="suppliers">
+          <i class="fa-solid fa-truck-field"></i> <span>Suppliers</span>
+        </a>
+        <a href="#reports" class="nav-item" data-tab="reports">
+          <i class="fa-solid fa-chart-line"></i> <span>Reports</span>
+        </a>
+        <a href="#settings" class="nav-item" data-tab="settings">
+          <i class="fa-solid fa-gear"></i> <span>Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" alt="Admin" class="avatar" />
+          <div>
+            <strong>Admin User</strong>
+            <small>Super Admin</small>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Header Bar -->
+      <header class="top-header">
+        <div class="header-search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="global-search" placeholder="Search anything (products, invoices, customers)..." />
+        </div>
+
+        <div class="header-actions">
+          <button id="theme-toggle" class="theme-btn" title="Toggle Light/Dark Mode">
+            <i class="fa-solid fa-sun light-icon"></i>
+            <i class="fa-solid fa-moon dark-icon"></i>
+            <span id="theme-text">Light Mode</span>
+          </button>
+          <div class="notification-badge" title="Notifications">
+            <i class="fa-regular fa-bell"></i>
+            <span class="dot"></span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Dashboard View -->
+      <section id="dashboard-view" class="view-section active">
+        <div class="view-header">
+          <div>
+            <h1>Dashboard</h1>
+            <p class="subtitle">Overview of sales, inventory, and payment analytics</p>
+          </div>
+          <div class="header-btns">
+            <button class="btn btn-primary" onclick="switchTab('pos')">
+              <i class="fa-solid fa-plus"></i> New Sale / Bill
+            </button>
+          </div>
+        </div>
+
+        <!-- Metric Overview Cards -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon sales">
+              <i class="fa-solid fa-wallet"></i>
+            </div>
+            <div class="stat-info">
+              <small>Total Sales</small>
+              <h2 id="stat-total-sales">₹0.00</h2>
+              <span class="trend positive"><i class="fa-solid fa-arrow-trend-up"></i> +12.5% vs last month</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon profit">
+              <i class="fa-solid fa-sack-dollar"></i>
+            </div>
+            <div class="stat-info">
+              <small>Total Profit</small>
+              <h2 id="stat-total-profit">₹0.00</h2>
+              <span class="trend positive"><i class="fa-solid fa-arrow-trend-up"></i> +8.4% vs last month</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon orders">
+              <i class="fa-solid fa-receipt"></i>
+            </div>
+            <div class="stat-info">
+              <small>Total Orders</small>
+              <h2 id="stat-total-orders">0</h2>
+              <span class="trend positive"><i class="fa-solid fa-arrow-trend-up"></i> +15.2% vs last month</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon stock">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div class="stat-info">
+              <small>Low Stock Items</small>
+              <h2 id="stat-low-stock">0</h2>
+              <a href="#inventory" onclick="switchTab('inventory')" class="view-alert-link">View low stock items &rarr;</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Breakdown Cards -->
+        <div class="payment-stats-grid">
+          <div class="pay-card cash">
+            <i class="fa-solid fa-money-bill-wave"></i>
+            <div>
+              <small>Cash Revenue</small>
+              <h3 id="stat-cash-sales">₹0.00</h3>
+            </div>
+          </div>
+          <div class="pay-card online">
+            <i class="fa-solid fa-qrcode"></i>
+            <div>
+              <small>Online / UPI Revenue</small>
+              <h3 id="stat-online-sales">₹0.00</h3>
+            </div>
+          </div>
+          <div class="pay-card card-pay">
+            <i class="fa-solid fa-credit-card"></i>
+            <div>
+              <small>Card Revenue</small>
+              <h3 id="stat-card-sales">₹0.00</h3>
+            </div>
+          </div>
+        </div>
+
+        <!-- Analytics Charts Row -->
+        <div class="charts-row">
+          <div class="chart-card flex-2">
+            <div class="card-header">
+              <h3>Sales Overview</h3>
+              <select id="sales-chart-period" class="select-sm">
+                <option value="7">This Week</option>
+                <option value="30">This Month</option>
+              </select>
+            </div>
+            <div class="chart-container">
+              <canvas id="salesOverviewChart"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card flex-1">
+            <div class="card-header">
+              <h3>Category-wise Sales</h3>
+            </div>
+            <div class="chart-container">
+              <canvas id="categoryChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Transactions Table -->
+        <div class="table-card">
+          <div class="card-header">
+            <h3>Recent Transactions</h3>
+            <button class="btn btn-secondary btn-sm" onclick="switchTab('reports')">View All</button>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Invoice ID</th>
+                  <th>Customer</th>
+                  <th>Date & Time</th>
+                  <th>Amount</th>
+                  <th>Payment Method</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="recent-transactions-body">
+                <tr><td colspan="7" class="text-center">Loading transactions...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Products Management View -->
+      <section id="products-view" class="view-section">
+        <div class="view-header">
+          <div>
+            <h1>Product Management</h1>
+            <p class="subtitle">Add, edit, filter, and track store products</p>
+          </div>
+          <button class="btn btn-primary" onclick="openProductModal()">
+            <i class="fa-solid fa-plus"></i> Add Product
+          </button>
+        </div>
+
+        <div class="filter-bar">
+          <div class="search-input-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="product-search" placeholder="Search product name..." />
+          </div>
+          <select id="product-cat-filter" class="select-filter">
+            <option value="All">All Categories</option>
+          </select>
+        </div>
+
+        <div class="table-card">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Image</th>
+                  <th>Product Name</th>
+                  <th>Category</th>
+                  <th>Price (₹)</th>
+                  <th>Stock</th>
+                  <th>Supplier</th>
+                  <th>Expiry Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="products-table-body">
+                <!-- Products loaded dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Categories View -->
+      <section id="categories-view" class="view-section">
+        <div class="view-header">
+          <div>
+            <h1>Categories</h1>
+            <p class="subtitle">Manage product categories</p>
+          </div>
+          <button class="btn btn-primary" onclick="openCategoryModal()">
+            <i class="fa-solid fa-plus"></i> Add Category
+          </button>
+        </div>
+
+        <div class="grid-cards-container" id="categories-grid">
+          <!-- Categories loaded dynamically -->
+        </div>
+      </section>
+
+      <!-- POS / Sales / Billing View -->
+      <section id="pos-view" class="view-section">
+        <div class="pos-container">
+          <!-- Left: Product Catalog -->
+          <div class="pos-catalog">
+            <div class="pos-search-bar">
+              <input type="text" id="pos-search" placeholder="Search product name or barcode..." />
+              <div class="category-pills" id="pos-category-pills">
+                <button class="pill active" data-cat="All">All</button>
+              </div>
+            </div>
+
+            <div class="pos-products-grid" id="pos-products-grid">
+              <!-- Product cards rendered here -->
+            </div>
+          </div>
+
+          <!-- Right: Cart & Checkout -->
+          <div class="pos-cart-panel">
+            <div class="cart-header">
+              <h3><i class="fa-solid fa-cart-shopping"></i> Billing Cart</h3>
+              <button class="btn btn-sm btn-outline-danger" onclick="clearCart()">Clear</button>
+            </div>
+
+            <div class="cart-items-list" id="cart-items-container">
+              <div class="empty-cart-state">
+                <i class="fa-solid fa-basket-shopping"></i>
+                <p>Cart is empty. Click on products to add.</p>
+              </div>
+            </div>
+
+            <div class="cart-summary">
+              <div class="summary-row">
+                <span>Customer Name:</span>
+                <input type="text" id="cart-customer-name" value="Walk-in Customer" class="input-sm" />
+              </div>
+              <div class="summary-row">
+                <span>Subtotal:</span>
+                <span id="cart-subtotal">₹0.00</span>
+              </div>
+              <div class="summary-row">
+                <span>Discount (₹):</span>
+                <input type="number" id="cart-discount" value="0" min="0" class="input-sm text-right" oninput="renderCartSummary()" />
+              </div>
+              <div class="summary-row">
+                <span>Tax Rate (%):</span>
+                <input type="number" id="cart-tax-rate" value="5" min="0" class="input-sm text-right" oninput="renderCartSummary()" />
+              </div>
+              <div class="summary-row total-row">
+                <strong>Grand Total:</strong>
+                <strong id="cart-grand-total">₹0.00</strong>
+              </div>
+
+              <button class="btn btn-success btn-block btn-lg" onclick="openPaymentModal()">
+                Proceed to Pay & Checkout <i class="fa-solid fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Inventory View -->
+      <section id="inventory-view" class="view-section">
+        <div class="view-header">
+          <div>
+            <h1>Inventory Management</h1>
+            <p class="subtitle">Track stock in/out and low stock alerts</p>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <div class="card-header">
+            <h3>Low Stock Alerts</h3>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th>Current Stock</th>
+                  <th>Threshold</th>
+                  <th>Status</th>
+                  <th>Quick Action</th>
+                </tr>
+              </thead>
+              <tbody id="low-stock-table-body">
+                <!-- Low stock items rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Customers View -->
+      <section id="customers-view" class="view-section">
+        <div class="view-header">
+          <div>
+            <h1>Customers</h1>
+            <p class="subtitle">View customer profiles and purchase history</p>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Customer Name</th>
+                  <th>Phone Number</th>
+                  <th>Email</th>
+                  <th>Total Purchases (₹)</th>
+                </tr>
+              </thead>
+              <tbody id="customers-table-body">
+                <!-- Customers rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Suppliers View -->
+      <section id="suppliers-view" class="view-section">
+        <div class="view-header">
+          <div>
+            <h1>Suppliers</h1>
+            <p class="subtitle">Supplier contacts and information</p>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Supplier Name</th>
+                  <th>Contact Person</th>
+                  <th>Phone</th>
+                  <th>Email</th>
+                </tr>
+              </thead>
+              <tbody id="suppliers-table-body">
+                <!-- Suppliers rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Reports View -->
+      <section id="reports-view" class="view-section">
+        <div class="view-header">
+          <div>
+            <h1>Reports & Analytics</h1>
+            <p class="subtitle">Sales reports, audit trail, and CSV export</p>
+          </div>
+          <a href="/api/reports/export" class="btn btn-secondary" target="_blank">
+            <i class="fa-solid fa-file-csv"></i> Export Sales CSV
+          </a>
+        </div>
+
+        <div class="table-card">
+          <div class="card-header">
+            <h3>Complete Sales Log</h3>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Invoice No</th>
+                  <th>Date</th>
+                  <th>Customer</th>
+                  <th>Discount</th>
+                  <th>Tax</th>
+                  <th>Total Amount</th>
+                  <th>Payment Method</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="reports-table-body">
+                <!-- Sales log -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Settings View -->
+      <section id="settings-view" class="view-section">
+        <div class="view-header">
+          <div>
+            <h1>Store Settings</h1>
+            <p class="subtitle">Configure store details and payment options</p>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <form id="settings-form" onsubmit="saveSettings(event)">
+            <div class="form-group">
+              <label>Store Name</label>
+              <input type="text" id="setting-store_name" class="input-control" value="GroceryHub" />
+            </div>
+            <div class="form-group">
+              <label>Address</label>
+              <input type="text" id="setting-store_address" class="input-control" value="123 Main Street, Commerce Zone" />
+            </div>
+            <div class="form-group">
+              <label>Default Tax Rate (%)</label>
+              <input type="number" id="setting-tax_rate" class="input-control" value="5" />
+            </div>
+            <div class="form-group">
+              <label>Enabled Payment Methods</label>
+              <div class="checkbox-group">
+                <label><input type="checkbox" checked disabled /> Cash (Default)</label>
+                <label><input type="checkbox" checked disabled /> Online / UPI</label>
+                <label><input type="checkbox" checked disabled /> Card (Debit/Credit)</label>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Settings</button>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- PAYMENT METHOD SELECTION MODAL -->
+  <div id="payment-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-credit-card"></i> Complete Payment</h3>
+        <button class="close-btn" onclick="closeModal('payment-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="pay-amount-display">
+          <small>Amount Payable</small>
+          <h2 id="modal-payable-amount">₹0.00</h2>
+        </div>
+
+        <label class="input-label">Select Payment Method:</label>
+        <div class="payment-tabs">
+          <button class="pay-tab active" data-method="Cash" onclick="selectPaymentMethod('Cash')">
+            <i class="fa-solid fa-money-bill-wave"></i> Cash
+          </button>
+          <button class="pay-tab" data-method="Online / UPI" onclick="selectPaymentMethod('Online / UPI')">
+            <i class="fa-solid fa-qrcode"></i> Online / UPI
+          </button>
+          <button class="pay-tab" data-method="Card" onclick="selectPaymentMethod('Card')">
+            <i class="fa-solid fa-credit-card"></i> Card
+          </button>
+        </div>
+
+        <!-- Cash Payment Section -->
+        <div id="pay-sec-cash" class="pay-section active">
+          <div class="form-group">
+            <label>Cash Tendered (₹):</label>
+            <input type="number" id="cash-tendered-input" class="input-control" placeholder="Enter cash received" oninput="calcCashChange()" />
+          </div>
+          <div class="change-display">
+            <span>Change to Return:</span>
+            <strong id="cash-change-val">₹0.00</strong>
+          </div>
+        </div>
+
+        <!-- Online / UPI Section -->
+        <div id="pay-sec-online" class="pay-section">
+          <div class="qr-code-box">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=upi://pay?pa=groceryhub@upi&pn=GroceryHub&am=100" alt="UPI QR" id="upi-qr-img" />
+            <small>Scan QR code with Google Pay, PhonePe, or Paytm</small>
+          </div>
+          <div class="form-group">
+            <label>Transaction / Ref ID:</label>
+            <input type="text" id="upi-ref-input" class="input-control" placeholder="e.g. UPI/123456789/OK" />
+          </div>
+        </div>
+
+        <!-- Card Payment Section -->
+        <div id="pay-sec-card" class="pay-section">
+          <div class="form-group">
+            <label>Card Authorization / Last 4 Digits:</label>
+            <input type="text" id="card-ref-input" class="input-control" placeholder="e.g. Card-4321" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('payment-modal')">Cancel</button>
+        <button class="btn btn-success" onclick="processCheckout()">Confirm & Generate Bill</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- INVOICE RECEIPT MODAL -->
+  <div id="invoice-modal" class="modal-backdrop">
+    <div class="modal-card width-md">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-receipt"></i> Invoice Receipt</h3>
+        <button class="close-btn" onclick="closeModal('invoice-modal')">&times;</button>
+      </div>
+      <div class="modal-body" id="invoice-receipt-content">
+        <!-- Receipt content rendered here -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="window.print()"><i class="fa-solid fa-print"></i> Print</button>
+        <button class="btn btn-primary" onclick="closeModal('invoice-modal')">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD PRODUCT MODAL -->
+  <div id="product-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="product-modal-title">Add New Product</h3>
+        <button class="close-btn" onclick="closeModal('product-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="product-form">
+          <input type="hidden" id="prod-edit-id" />
+          <div class="form-group">
+            <label>Product Name *</label>
+            <input type="text" id="prod-name" class="input-control" required />
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <input type="text" id="prod-category" class="input-control" placeholder="e.g. Grains, Dairy" />
+          </div>
+          <div class="form-group-row">
+            <div class="form-group">
+              <label>Price (₹) *</label>
+              <input type="number" step="0.01" id="prod-price" class="input-control" required />
+            </div>
+            <div class="form-group">
+              <label>Stock Quantity *</label>
+              <input type="number" id="prod-quantity" class="input-control" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Supplier</label>
+            <input type="text" id="prod-supplier" class="input-control" />
+          </div>
+          <div class="form-group">
+            <label>Expiry Date</label>
+            <input type="date" id="prod-expiry" class="input-control" />
+          </div>
+          <div class="form-group">
+            <label>Image URL (Optional)</label>
+            <input type="url" id="prod-image" class="input-control" placeholder="https://..." />
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('product-modal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveProduct()">Save Product</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD CATEGORY MODAL -->
+  <div id="category-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Add Category</h3>
+        <button class="close-btn" onclick="closeModal('category-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Category Name *</label>
+          <input type="text" id="cat-name" class="input-control" required />
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <input type="text" id="cat-desc" class="input-control" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('category-modal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveCategory()">Save Category</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom App JS -->
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

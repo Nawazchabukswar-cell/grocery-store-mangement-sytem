@@ -1,0 +1,9 @@
+# Grocery Store Management System
+#
+# This project uses ONLY the Python standard library:
+#   - tkinter  (GUI)   -> included with standard Python installers on Windows
+#   - sqlite3  (database) -> built into Python
+#   - datetime, os     -> built into Python
+#
+# No third-party packages are required, so there is nothing to pip install.
+# This file is included to satisfy the "requirements.txt" project convention.
