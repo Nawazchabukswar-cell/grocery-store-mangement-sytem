@@ -266,6 +266,39 @@ def api_get_customers():
         conn.close()
 
 
+@app.route("/api/customers", methods=["POST"])
+def api_add_customer():
+    data = request.json or {}
+    name = data.get("name", "").strip()
+    phone = data.get("phone", "").strip()
+    email = data.get("email", "").strip()
+    if not name:
+        return jsonify({"error": "Customer name is required."}), 400
+
+    conn = get_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO customers (name, phone, email) VALUES (?, ?, ?)", (name, phone, email))
+        conn.commit()
+        return jsonify({"success": True, "id": cursor.lastrowid, "message": "Customer added successfully."})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+    finally:
+        conn.close()
+
+
+@app.route("/api/customers/<int:cust_id>", methods=["DELETE"])
+def api_delete_customer(cust_id):
+    conn = get_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM customers WHERE id=?", (cust_id,))
+        conn.commit()
+        return jsonify({"success": True, "message": "Customer deleted successfully."})
+    finally:
+        conn.close()
+
+
 @app.route("/api/suppliers", methods=["GET"])
 def api_get_suppliers():
     conn = get_connection()
@@ -273,6 +306,43 @@ def api_get_suppliers():
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM suppliers ORDER BY id DESC")
         return jsonify([dict(r) for r in cursor.fetchall()])
+    finally:
+        conn.close()
+
+
+@app.route("/api/suppliers", methods=["POST"])
+def api_add_supplier():
+    data = request.json or {}
+    name = data.get("name", "").strip()
+    contact_person = data.get("contact_person", "").strip()
+    phone = data.get("phone", "").strip()
+    email = data.get("email", "").strip()
+    if not name:
+        return jsonify({"error": "Supplier name is required."}), 400
+
+    conn = get_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO suppliers (name, contact_person, phone, email) VALUES (?, ?, ?, ?)",
+            (name, contact_person, phone, email)
+        )
+        conn.commit()
+        return jsonify({"success": True, "id": cursor.lastrowid, "message": "Supplier added successfully."})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+    finally:
+        conn.close()
+
+
+@app.route("/api/suppliers/<int:supp_id>", methods=["DELETE"])
+def api_delete_supplier(supp_id):
+    conn = get_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM suppliers WHERE id=?", (supp_id,))
+        conn.commit()
+        return jsonify({"success": True, "message": "Supplier deleted successfully."})
     finally:
         conn.close()
 
@@ -319,5 +389,8 @@ def export_sales_csv():
 
 
 if __name__ == "__main__":
-    print("Starting GroceryHub Web Application Server at http://127.0.0.1:5000 ...")
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    is_debug = os.environ.get("FLASK_ENV") == "development"
+    print(f"Starting GroceryHub Web Application Server at http://0.0.0.0:{port} ...")
+    app.run(host="0.0.0.0", port=port, debug=is_debug)
+

@@ -4,10 +4,18 @@ View and search past sales transactions, filter by payment method (Cash, Online/
 and inspect detailed invoice records.
 """
 
-import tkinter as tk
-from tkinter import ttk, messagebox
+try:
+    import tkinter as tk
+    from tkinter import ttk, messagebox
+    HAS_TKINTER = True
+except (ImportError, RuntimeError):
+    HAS_TKINTER = False
+    tk = None
+    ttk = None
+    messagebox = None
 
 from database import get_connection
+
 
 
 # ---------------------------------------------------------------------------
@@ -108,7 +116,7 @@ def get_total_sales_count_and_revenue():
 # GUI layer
 # ---------------------------------------------------------------------------
 
-class TransactionWindow(tk.Toplevel):
+class TransactionWindow(tk.Toplevel if HAS_TKINTER else object):
     """Window for browsing past transactions, filtering by payment method, and viewing details."""
 
     def __init__(self, master, on_close_callback=None):

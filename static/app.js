@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadCustomers();
   loadSuppliers();
   loadReports();
+  loadSettings();
 });
 
 // Theme Control
@@ -766,11 +767,53 @@ async function loadCustomers() {
         <td>${c.phone || '-'}</td>
         <td>${c.email || '-'}</td>
         <td><strong>₹${(c.total_purchases || 0).toFixed(2)}</strong></td>
+        <td>
+          <button class="btn btn-sm btn-danger" onclick="deleteCustomer(${c.id})"><i class="fa-solid fa-trash"></i></button>
+        </td>
       `;
       tbody.appendChild(row);
     });
   } catch (err) {
     console.error("Failed to load customers", err);
+  }
+}
+
+function openCustomerModal() {
+  document.getElementById('cust-name').value = '';
+  document.getElementById('cust-phone').value = '';
+  document.getElementById('cust-email').value = '';
+  document.getElementById('customer-modal').classList.add('active');
+}
+
+async function saveCustomer() {
+  const name = document.getElementById('cust-name').value.trim();
+  const phone = document.getElementById('cust-phone').value.trim();
+  const email = document.getElementById('cust-email').value.trim();
+
+  if (!name) {
+    alert("Customer name is required.");
+    return;
+  }
+
+  const res = await fetch('/api/customers', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, phone, email })
+  });
+
+  if (res.ok) {
+    closeModal('customer-modal');
+    loadCustomers();
+  } else {
+    alert("Failed to add customer.");
+  }
+}
+
+async function deleteCustomer(id) {
+  if (!confirm("Are you sure you want to delete this customer?")) return;
+  const res = await fetch(`/api/customers/${id}`, { method: 'DELETE' });
+  if (res.ok) {
+    loadCustomers();
   }
 }
 
@@ -791,11 +834,55 @@ async function loadSuppliers() {
         <td>${s.contact_person || '-'}</td>
         <td>${s.phone || '-'}</td>
         <td>${s.email || '-'}</td>
+        <td>
+          <button class="btn btn-sm btn-danger" onclick="deleteSupplier(${s.id})"><i class="fa-solid fa-trash"></i></button>
+        </td>
       `;
       tbody.appendChild(row);
     });
   } catch (err) {
     console.error("Failed to load suppliers", err);
+  }
+}
+
+function openSupplierModal() {
+  document.getElementById('supp-name').value = '';
+  document.getElementById('supp-contact').value = '';
+  document.getElementById('supp-phone').value = '';
+  document.getElementById('supp-email').value = '';
+  document.getElementById('supplier-modal').classList.add('active');
+}
+
+async function saveSupplier() {
+  const name = document.getElementById('supp-name').value.trim();
+  const contact_person = document.getElementById('supp-contact').value.trim();
+  const phone = document.getElementById('supp-phone').value.trim();
+  const email = document.getElementById('supp-email').value.trim();
+
+  if (!name) {
+    alert("Supplier name is required.");
+    return;
+  }
+
+  const res = await fetch('/api/suppliers', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, contact_person, phone, email })
+  });
+
+  if (res.ok) {
+    closeModal('supplier-modal');
+    loadSuppliers();
+  } else {
+    alert("Failed to add supplier.");
+  }
+}
+
+async function deleteSupplier(id) {
+  if (!confirm("Are you sure you want to delete this supplier?")) return;
+  const res = await fetch(`/api/suppliers/${id}`, { method: 'DELETE' });
+  if (res.ok) {
+    loadSuppliers();
   }
 }
 
@@ -832,6 +919,48 @@ async function loadReports() {
   }
 }
 
+async function loadSettings() {
+  try {
+    const res = await fetch('/api/settings');
+    const settings = await res.json();
+
+    if (settings.store_name && document.getElementById('setting-store_name')) {
+      document.getElementById('setting-store_name').value = settings.store_name;
+    }
+    if (settings.store_address && document.getElementById('setting-store_address')) {
+      document.getElementById('setting-store_address').value = settings.store_address;
+    }
+    if (settings.tax_rate && document.getElementById('setting-tax_rate')) {
+      document.getElementById('setting-tax_rate').value = settings.tax_rate;
+    }
+  } catch (err) {
+    console.error("Failed to load settings", err);
+  }
+}
+
+async function saveSettings(event) {
+  if (event) event.preventDefault();
+  const store_name = document.getElementById('setting-store_name').value.trim();
+  const store_address = document.getElementById('setting-store_address').value.trim();
+  const tax_rate = document.getElementById('setting-tax_rate').value.trim();
+
+  try {
+    const res = await fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ store_name, store_address, tax_rate })
+    });
+    if (res.ok) {
+      alert("Settings saved successfully!");
+    } else {
+      alert("Failed to save settings.");
+    }
+  } catch (err) {
+    alert("Error saving settings.");
+  }
+}
+
 function closeModal(modalId) {
   document.getElementById(modalId).classList.remove('active');
 }
+

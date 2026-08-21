@@ -5,12 +5,21 @@ atomic invoice generation, and the Tkinter GUI window used to create bills.
 """
 
 import os
-import tkinter as tk
-from tkinter import ttk, messagebox
 from datetime import datetime
+
+try:
+    import tkinter as tk
+    from tkinter import ttk, messagebox
+    HAS_TKINTER = True
+except (ImportError, RuntimeError):
+    HAS_TKINTER = False
+    tk = None
+    ttk = None
+    messagebox = None
 
 from database import get_connection
 from products import get_all_products, search_products
+
 
 
 # ---------------------------------------------------------------------------
@@ -100,7 +109,7 @@ def create_sale(cart_items, payment_method="Cash", discount=0.0, tax=0.0, custom
 # GUI layer
 # ---------------------------------------------------------------------------
 
-class BillingWindow(tk.Toplevel):
+class BillingWindow(tk.Toplevel if HAS_TKINTER else object):
     """Window used to build a shopping cart, choose payment method, and generate a bill."""
 
     def __init__(self, master, on_close_callback=None):

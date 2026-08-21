@@ -5,15 +5,23 @@ and provides quick navigation buttons to the modules of the Grocery Store Manage
 """
 
 import webbrowser
-import tkinter as tk
-from tkinter import font as tkfont, messagebox
+try:
+    import tkinter as tk
+    from tkinter import font as tkfont, messagebox
+    HAS_TKINTER = True
+except (ImportError, RuntimeError):
+    HAS_TKINTER = False
+    tk = None
+    tkfont = None
+    messagebox = None
 
 from products import get_all_products, get_low_stock_products, ProductWindow
 from billing import BillingWindow
 from transactions import TransactionWindow, get_total_sales_count_and_revenue
 
 
-class DashboardWindow(tk.Tk):
+class DashboardWindow(tk.Tk if HAS_TKINTER else object):
+
     """The main application window (root)."""
 
     def __init__(self):

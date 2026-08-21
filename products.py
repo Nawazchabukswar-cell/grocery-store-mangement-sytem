@@ -6,10 +6,18 @@ Stock management (adding stock, viewing current/low stock) also lives
 here since stock is simply a field on each product.
 """
 
-import tkinter as tk
-from tkinter import ttk, messagebox
+try:
+    import tkinter as tk
+    from tkinter import ttk, messagebox
+    HAS_TKINTER = True
+except (ImportError, RuntimeError):
+    HAS_TKINTER = False
+    tk = None
+    ttk = None
+    messagebox = None
 
 from database import get_connection
+
 
 LOW_STOCK_THRESHOLD = 10  # Products at or below this quantity are "low stock"
 
@@ -136,7 +144,7 @@ def adjust_stock(product_id, quantity_delta):
 # GUI layer
 # ---------------------------------------------------------------------------
 
-class ProductWindow(tk.Toplevel):
+class ProductWindow(tk.Toplevel if HAS_TKINTER else object):
     """Window for managing product inventory and stock (add / update / delete / search)."""
 
     def __init__(self, master, on_close_callback=None):

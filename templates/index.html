@@ -388,6 +388,9 @@
             <h1>Customers</h1>
             <p class="subtitle">View customer profiles and purchase history</p>
           </div>
+          <button class="btn btn-primary" onclick="openCustomerModal()">
+            <i class="fa-solid fa-user-plus"></i> Add Customer
+          </button>
         </div>
 
         <div class="table-card">
@@ -400,6 +403,7 @@
                   <th>Phone Number</th>
                   <th>Email</th>
                   <th>Total Purchases (₹)</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody id="customers-table-body">
@@ -417,6 +421,9 @@
             <h1>Suppliers</h1>
             <p class="subtitle">Supplier contacts and information</p>
           </div>
+          <button class="btn btn-primary" onclick="openSupplierModal()">
+            <i class="fa-solid fa-truck-ramp-box"></i> Add Supplier
+          </button>
         </div>
 
         <div class="table-card">
@@ -429,6 +436,7 @@
                   <th>Contact Person</th>
                   <th>Phone</th>
                   <th>Email</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody id="suppliers-table-body">
@@ -438,6 +446,7 @@
           </div>
         </div>
       </section>
+
 
       <!-- Reports View -->
       <section id="reports-view" class="view-section">
@@ -669,6 +678,67 @@
       </div>
     </div>
   </div>
+
+  <!-- ADD CUSTOMER MODAL -->
+  <div id="customer-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Add Customer</h3>
+        <button class="close-btn" onclick="closeModal('customer-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Customer Name *</label>
+          <input type="text" id="cust-name" class="input-control" required />
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="text" id="cust-phone" class="input-control" />
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="cust-email" class="input-control" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('customer-modal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveCustomer()">Save Customer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD SUPPLIER MODAL -->
+  <div id="supplier-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Add Supplier</h3>
+        <button class="close-btn" onclick="closeModal('supplier-modal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Supplier Name *</label>
+          <input type="text" id="supp-name" class="input-control" required />
+        </div>
+        <div class="form-group">
+          <label>Contact Person</label>
+          <input type="text" id="supp-contact" class="input-control" />
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="text" id="supp-phone" class="input-control" />
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="supp-email" class="input-control" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('supplier-modal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveSupplier()">Save Supplier</button>
+      </div>
+    </div>
+  </div>
+
 
   <!-- Custom App JS -->
   <script src="{{ url_for('static', filename='app.js') }}"></script>
